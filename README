@@ -1,3 +1,53 @@
 
 Golang in action
 
+gerryyang@mba:~$godoc
+usage: godoc package [name ...]
+	godoc -http=:6060
+  -ex=false: show examples in command line mode
+  -goroot="/usr/local/go": Go root directory
+  -html=false: print HTML in command-line mode
+  -http="": HTTP service address (e.g., ':6060')
+  -httptest.serve="": if non-empty, httptest.NewServer serves on this address and blocks
+  -index=false: enable search index
+  -index_files="": glob pattern specifying index files;if not empty, the index is read from these files in sorted order
+  -index_throttle=0.75: index throttle value; 0.0 = no time allocated, 1.0 = full throttle
+  -links=true: link identifiers to their declarations
+  -maxresults=10000: maximum number of full text search results shown
+  -notes="BUG": regular expression matching note markers to show
+  -play=false: enable playground in web interface
+  -q=false: arguments are considered search queries
+  -server="": webserver address for command line searches
+  -src=false: print (exported) source in command-line mode
+  -tabwidth=4: tab width
+  -templates="": directory containing alternate template files
+  -timestamps=false: show timestamps with directory listings
+  -url="": print HTML for named URL
+  -v=false: verbose mode
+  -write_index=false: write index to a file; the file name must be specified with -index_files
+  -zip="": zip file providing the file system to serve; disabled if empty
+
+Go的文档工具 —— go doc
+查看帮助，输入下面的命令然后就可以在浏览器中打开127.0.0.1:8080，看到一个golang.org的本地副本，通过它可查询pkg文档等其他内容。
+gerryyang@mba:~$godoc -http=:8080
+
+其他命令
+gerryyang@mba:~$go version
+go version devel +f4d1cb8d9a91 Thu Sep 19 22:34:33 2013 +1000 darwin/amd64
+gerryyang@mba:~$go env
+GOARCH="amd64"
+GOBIN=""
+GOCHAR="6"
+GOEXE=""
+GOHOSTARCH="amd64"
+GOHOSTOS="darwin"
+GOOS="darwin"
+GOPATH="/Users/gerryyang/code/go/mygo"
+GORACE=""
+GOROOT="/usr/local/go"
+GOTOOLDIR="/usr/local/go/pkg/tool/darwin_amd64"
+TERM="dumb"
+CC="clang"
+GOGCCFLAGS="-g -O2 -fPIC -m64 -pthread -fno-caret-diagnostics -Qunused-arguments -fno-common"
+CGO_ENABLED="1"
+
