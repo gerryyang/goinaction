@@ -113,4 +113,5 @@ func main() {
 	fmt.Println("runtime.GoMaxProcs: ", *GoMaxProcs)
 	fmt.Println("time elapsed: ", elapsed, "us")
 	fmt.Println("time avg: ", elapsed/float64(actualTotalPings), "us")
+	fmt.Println("reqs of per seconds: ", float64(actualTotalPings)/elapsed*1000000)
 }
