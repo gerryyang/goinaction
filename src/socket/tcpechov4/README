@@ -2,4 +2,6 @@
 tcpforward benchmark tool
 long connections mode and deal with err cases.
 
+refer to http://eng.42go.com/scala-vs-go-tcp-benchmark/
+
 
