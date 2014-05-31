@@ -31,23 +31,26 @@ func ping(tcpAddr *net.TCPAddr, id string, times int, lockChan chan bool) {
 	conn, err := net.DialTCP("tcp", nil, tcpAddr)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "DialTCP: [%s]%s\n", id, err.Error())
+		lockChan <- true
 		return
 	}
 
 	for i := 0; i < int(times); i++ {
-		n, err := conn.Write([]byte("Ping"))
+		_, err := conn.Write([]byte("Ping"))
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Write: %s\n", err.Error())
+			lockChan <- true
 			return
 		}
 
 		var buf [4]byte
-		n, err = conn.Read(buf[0:])
+		_, err = conn.Read(buf[0:])
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Read: %s\n", err.Error())
+			lockChan <- true
 			return
 		}
-		fmt.Fprintf(os.Stdout, "%d:%s\n", n, buf)
+		//fmt.Fprintf(os.Stdout, "%d:%s\n", n, buf)
 
 	}
 	lockChan <- true
@@ -100,5 +103,14 @@ func main() {
 		<-lockChan
 	}
 	elapsed := 1000000 * time.Since(start).Seconds()
-	fmt.Println("avg: ", elapsed/float64(actualTotalPings), "us")
+
+	// show result info
+	fmt.Println("--------------- results ---------------")
+	fmt.Println("test svr info: ", *ServiceInfo)
+	fmt.Println("routine counts: ", *RoutineNum)
+	fmt.Println("routine reqs: ", *RoutineReqNum)
+	fmt.Println("total reqs: ", totalPings)
+	fmt.Println("runtime.GoMaxProcs: ", *GoMaxProcs)
+	fmt.Println("time elapsed: ", elapsed, "us")
+	fmt.Println("time avg: ", elapsed/float64(actualTotalPings), "us")
 }
