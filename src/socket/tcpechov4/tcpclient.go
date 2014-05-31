@@ -25,6 +25,19 @@ func fatal(err error) {
 	}
 }
 
+func monitorGoroutine() {
+	for {
+		fmt.Println("NumGoroutine: ", runtime.NumGoroutine())
+
+		// Gosched yields the processor, allowing other goroutines to run.
+		// It does not suspend the current goroutine, so execution resumes automatically.
+		runtime.Gosched()
+
+		// sleep for a while
+		time.Sleep(time.Duration(3) * time.Second)
+	}
+}
+
 func ping(tcpAddr *net.TCPAddr, id string, times int, lockChan chan bool) {
 
 	fmt.Println(id + " start")
@@ -77,9 +90,13 @@ func main() {
 	}
 
 	// The GOMAXPROCS variable limits the number of operating system threads that can execute user-level Go code simultaneously.
+	fmt.Println("NumCPU: ", runtime.NumCPU())
 	if *GoMaxProcs > 0 {
 		runtime.GOMAXPROCS(*GoMaxProcs)
 	}
+
+	// debug
+	//go monitorGoroutine()
 
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", *ServiceInfo)
 	fatal(err)
@@ -107,10 +124,11 @@ func main() {
 	// show result info
 	fmt.Println("--------------- results ---------------")
 	fmt.Println("test svr info: ", *ServiceInfo)
+	fmt.Println("NumCPU: ", runtime.NumCPU())
+	fmt.Println("runtime.GoMaxProcs: ", *GoMaxProcs)
 	fmt.Println("routine counts: ", *RoutineNum)
 	fmt.Println("routine reqs: ", *RoutineReqNum)
 	fmt.Println("total reqs: ", totalPings)
-	fmt.Println("runtime.GoMaxProcs: ", *GoMaxProcs)
 	fmt.Println("time elapsed: ", elapsed, "us")
 	fmt.Println("time avg: ", elapsed/float64(actualTotalPings), "us")
 	fmt.Println("reqs of per seconds: ", float64(actualTotalPings)/elapsed*1000000)
