@@ -30,7 +30,7 @@ func handleClient(conn net.Conn) {
 	for {
 		n, err := conn.Read(buf[0:])
 		if err != nil {
-			//fmt.Fprintf(os.Stderr, "Read: %s\n", err.Error())
+			fmt.Fprintf(os.Stderr, "Read: %s\n", err.Error())
 			return
 		}
 		//fmt.Fprintf(os.Stdout, "%d:%s\n", n, buf)
