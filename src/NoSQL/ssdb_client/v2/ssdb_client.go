@@ -62,7 +62,20 @@ func routine(service string, mode string, id string, times int, lockChan chan bo
 				lockChan <- true
 				return
 			}
-			//fmt.Printf("%s\n", val)
+			fmt.Printf("%s\n", val)
+
+		} else if mode == "multi_get" {
+
+			keys := []string{}
+			keys = append(keys, "c")
+			keys = append(keys, "d")
+			val, err = db.Do("multi_get", "a", "b", keys)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "db.Do multi_get: [%s]%s\n", id, err.Error())
+				lockChan <- true
+				return
+			}
+			fmt.Printf("%s\n", val)
 
 		} else if mode == "set" {
 
@@ -72,7 +85,14 @@ func routine(service string, mode string, id string, times int, lockChan chan bo
 				lockChan <- true
 				return
 			}
-			//fmt.Printf("%s\n", val)
+			fmt.Printf("%s\n", val)
+			val, err = db.Set("b", "wcdj")
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "db.Set: [%s]%s\n", id, err.Error())
+				lockChan <- true
+				return
+			}
+			fmt.Printf("%s\n", val)
 
 		} else {
 
@@ -128,7 +148,7 @@ func routine(service string, mode string, id string, times int, lockChan chan bo
 func main() {
 
 	var ServiceInfo = flag.String("s", "127.0.0.1:8888", "host:port")
-	var Mode = flag.String("m", "get", "get|set")
+	var Mode = flag.String("m", "get", "get|multi_get|set")
 	var RoutineNum = flag.Int("t", 1, "routine counts")
 	var RoutineReqNum = flag.Int("c", 1, "each routine requst counts")
 	var GoMaxProcs = flag.Int("core", 0, "set GOMAXPROCS variable for simultaneously")
