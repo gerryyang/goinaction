@@ -6,7 +6,11 @@ package main
 #include <unistd.h>
 #include "../inc/hello.h"
 
-#if 1
+// intentionally write the same LDFLAGS differently
+#cgo linux LDFLAGS: -L../lib -lhello
+#cgo darwin LDFLAGS: -L../lib -lhello
+
+#if 0
 void hello(const char *name)
 {
 	printf("%s\n", name);
