@@ -1,4 +1,4 @@
-// main.cpp
+// main.c
 
 #include "hello.h"
 

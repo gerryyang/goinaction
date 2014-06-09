@@ -6,11 +6,13 @@ package main
 #include <unistd.h>
 #include "../inc/hello.h"
 
+#if 1
 void hello(const char *name)
 {
 	printf("%s\n", name);
 	return;
 }
+#endif
 */
 import "C"
 
