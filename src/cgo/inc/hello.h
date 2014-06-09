@@ -3,7 +3,7 @@
 #ifndef HELLO_H
 #define HELLO_H
 
-#include <cstdio>
+#include <stdio.h>
 
 void hello(const char *name);
 
