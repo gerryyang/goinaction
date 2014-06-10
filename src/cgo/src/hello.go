@@ -4,11 +4,14 @@ package main
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "../inc/hello.h"
+#include "hello.h"
 
 // intentionally write the same LDFLAGS differently
+#cgo linux CFLAGS: -I/Users/gerryyang/github_project/goinaction/src/cgo/inc
 #cgo linux LDFLAGS: -L../lib -lhello
+#cgo darwin CFLAGS: -I/Users/gerryyang/github_project/goinaction/src/cgo/inc
 #cgo darwin LDFLAGS: -L../lib -lhello
+
 
 #if 0
 void hello(const char *name)
