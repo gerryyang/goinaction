@@ -1,7 +1,7 @@
 package main
 
 import (
-	"./ssdb"
+	"./tonedb"
 	"flag"
 	"fmt"
 	"os"
@@ -16,7 +16,7 @@ const (
 )
 
 func printVersion() {
-	fmt.Println("benchmark v" + VERSION + " by gerry")
+	fmt.Println("tonecli v" + VERSION + " by T-ONE")
 }
 
 func fatal(err error) {
@@ -43,9 +43,9 @@ func routine(service string, mode string, id string, times int, lockChan chan bo
 
 	fmt.Println(id + " start")
 
-	db, err := ssdb.ConnectService(service)
+	db, err := tonedb.ConnectService(service)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "ssdb.ConnectService: [%s]%s\n", id, err.Error())
+		fmt.Fprintf(os.Stderr, "tonedb.ConnectService: [%s]%s\n", id, err.Error())
 		lockChan <- true
 		return
 	}
@@ -147,7 +147,7 @@ func routine(service string, mode string, id string, times int, lockChan chan bo
 
 func main() {
 
-	var ServiceInfo = flag.String("s", "127.0.0.1:8888", "host:port")
+	var ServiceInfo = flag.String("s", "127.0.0.1:9001", "host:port")
 	var Mode = flag.String("m", "get", "get|multi_get|set")
 	var RoutineNum = flag.Int("t", 1, "routine counts")
 	var RoutineReqNum = flag.Int("c", 1, "each routine requst counts")
