@@ -2,9 +2,6 @@
 Golang in action
 
 
-http://coolshell.cn/articles/8460.html
-http://coolshell.cn/articles/8489.html
-
 gerryyang@mba:~$godoc
 usage: godoc package [name ...]
 	godoc -http=:6060
@@ -54,4 +51,8 @@ TERM="dumb"
 CC="clang"
 GOGCCFLAGS="-g -O2 -fPIC -m64 -pthread -fno-caret-diagnostics -Qunused-arguments -fno-common"
 CGO_ENABLED="1"
+
+参考
+http://coolshell.cn/articles/8460.html
+http://coolshell.cn/articles/8489.html
 
