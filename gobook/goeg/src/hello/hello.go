@@ -23,7 +23,19 @@ import (
 func main() {
     who := "World!"
     if len(os.Args) > 1 { /* os.Args[0] is "hello" or "hello.exe" */
-        who = strings.Join(os.Args[1:], " ")
+        who = strings.Join(os.Args[1:], ",")
     }
-    fmt.Println("Hello", who)
+    fmt.Println("Hello~", who)
 }
+/*
+func Join(a []string, sep string) string
+
+Join concatenates the elements of a to create a single string. The separator string sep is placed between elements in the resulting string. 
+
+output:
+gerryyang@mba:hello$./hello 
+Hello~ World!
+gerryyang@mba:hello$./hello golang
+Hello~ golang
+
+*/
