@@ -1,0 +1,14 @@
+This is just some test text. It contains some of the British words that
+have different spellings in American English, such as behavior, color,
+favorite, labor, and neighbor.
+
+In fact the differences between British and American spellings aren't
+that great. Some British words that end with "our" get "or" endings in
+American English, and similarly for "re" to "er" (for example "Center"
+becomes "Center"), and "ogue" becomes "og" as with dialog and
+catalog.
+
+There are also a few more obscure changes, such as "ence" to "ense", for
+example "defense" becomes "defense". And there are a few miscellaneous
+differences, such as for anemia, hemorrhage, aluminum, check, curb,
+tire, sulfur, and maneuver.
