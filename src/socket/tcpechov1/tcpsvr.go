@@ -43,7 +43,7 @@ func checkError(err error) {
 }
 
 func handleClient(conn net.Conn) {
-	//defer conn.Close()
+	defer conn.Close()
 	daytime := time.Now().String()
 	conn.Write([]byte(daytime))
 	//time.Sleep(time.Duration(100) * time.Second)
