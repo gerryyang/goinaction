@@ -11,7 +11,8 @@ import (
 func main() {
 	runtime.GOMAXPROCS(4)
 
-	service := "127.0.0.1:9001"
+	//service := "127.0.0.1:9001"
+	service := ":9001"
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", service)
 	checkError(err)
 
