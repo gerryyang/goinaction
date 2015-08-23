@@ -1,0 +1,1 @@
+This tool(file_scp) likes scp(secure copy, remote file copy program) but uses golang to copies files between hosts on a network.
