@@ -112,10 +112,18 @@ func main() {
 
 	var cid int = 0
 	cnt, err := fin.ReadAt(buf, offset)
+	if err == io.EOF {
+		fmt.Println("job is too big")
+	}
 	for cid = 0; err != io.EOF; cid++ {
 		cnt, err = fin.ReadAt(buf, offset)
-		if cnt != 0 {
-			offset += job
+		//fmt.Println("----", cnt)
+		if cnt == len(buf) || err == io.EOF {
+			if cnt == len(buf) {
+				offset += job
+			} else {
+				offset += int64(cnt)
+			}
 			fmt.Printf("read %d bytes: %q\n", cnt, buf[:cnt])
 			var req string = string(buf[:cnt])
 			go proc(&req, cid, job, service, lockChan)
