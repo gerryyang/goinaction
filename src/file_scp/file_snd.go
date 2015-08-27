@@ -9,15 +9,17 @@ import (
 	"net"
 	"os"
 	"runtime"
+	"strconv"
 	"time"
 )
 
 const (
-	VERSION = "1.0.0"
+	VERSION    = "1.0.0"
+	REQ_HEADER = "10001" // 0X2711
 )
 
 func printVersion() {
-	fmt.Println("file sender" + VERSION + " by gerryyang")
+	fmt.Println("file snd" + VERSION + " by gerryyang")
 }
 
 func checkError(err error) {
@@ -67,11 +69,9 @@ func proc(req *string, cid int, offset int64, service string, lockChan chan bool
 }
 
 func send(tcpAddr *net.TCPAddr, req *string, cid_name string, offset int64, lockChan chan bool) {
-	fmt.Printf("[%s] start\n", cid_name)
-
 	conn, err := net.DialTCP("tcp", nil, tcpAddr)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "[%s]DialTCP: %s\n", cid_name, err.Error())
+		fmt.Fprintf(os.Stderr, "DialTCP: cid_name[%s] err[%s]\n", cid_name, err.Error())
 		lockChan <- true
 		return
 	}
@@ -79,17 +79,19 @@ func send(tcpAddr *net.TCPAddr, req *string, cid_name string, offset int64, lock
 	var cid int
 	fmt.Sscanf(cid_name, "%d", &cid)
 
-	// TODO
+	req_header, _ := strconv.ParseInt(REQ_HEADER, 10, 64)
+
 	var bytes_buf bytes.Buffer
+	bytes_buf.Write(Int64ToBytes(req_header))
 	bytes_buf.Write(Int64ToBytes(offset))
 	bytes_buf.Write([]byte(*req))
 
-	fmt.Printf("%s Write[%#v]\n", cid_name, bytes_buf.Bytes())
+	fmt.Printf("send: cid_name[%s] bytes_buf[%#v]\n", cid_name, bytes_buf.Bytes())
 	//fmt.Printf("%q\n", bytes_buf.Bytes())
 
 	_, err = conn.Write(bytes_buf.Bytes())
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "[%s]Write: %s\n", cid_name, err.Error())
+		fmt.Fprintf(os.Stderr, "Write: cid_name[%s] err[%s]\n", cid_name, err.Error())
 		lockChan <- true
 		return
 	}
@@ -97,11 +99,11 @@ func send(tcpAddr *net.TCPAddr, req *string, cid_name string, offset int64, lock
 	var ans_buf [4]byte
 	_, err = conn.Read(ans_buf[0:])
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "[%s]Read: %s\n", cid_name, err.Error())
+		fmt.Fprintf(os.Stderr, "Read: cid_name[%s] err[%s]\n", cid_name, err.Error())
 		lockChan <- true
 		return
 	}
-	fmt.Fprintf(os.Stdout, "[%s]Read: %s\n", cid_name, ans_buf)
+	fmt.Fprintf(os.Stdout, "Read: cid_name[%s] ans_buf[%s]\n", cid_name, ans_buf)
 
 	lockChan <- true
 	conn.Close()
@@ -126,11 +128,10 @@ func main() {
 	for {
 		cnt, err := fin.ReadAt(buf, offset)
 		if err == io.EOF {
-			fmt.Println("=====1 cid:", cid)
 			if cnt == 0 {
 				break
 			}
-			fmt.Printf("cid[%d] offset[%d] read %d bytes: %q\n", cid, offset, cnt, buf[:cnt])
+			fmt.Printf("cid[%d] offset[%d] read bytes[%d] buf[%q]\n", cid, offset, cnt, buf[:cnt])
 			var req string = string(buf[:cnt])
 			go proc(&req, cid, offset, service, lockChan)
 			offset += int64(cnt)
@@ -138,42 +139,21 @@ func main() {
 			break
 
 		} else if cnt != len(buf) {
-			fmt.Println("=====2 cid:", cid)
 			continue
 
 		} else {
-			fmt.Println("=====3 cid:", cid)
-			fmt.Printf("cid[%d] offset[%d] read %d bytes: %q\n", cid, offset, cnt, buf[:cnt])
+			fmt.Printf("cid[%d] offset[%d] read bytes[%d] buf[%q]\n", cid, offset, cnt, buf[:cnt])
 			var req string = string(buf[:cnt])
 			go proc(&req, cid, offset, service, lockChan)
 			offset += int64(len(buf))
 			cid++
 		}
 	}
-	/*
-		cnt, err := fin.ReadAt(buf, offset)
-		if err == io.EOF {
-			fmt.Println("job is too big")
-		}
-		for cid = 0; err != io.EOF; cid++ {
-			cnt, err = fin.ReadAt(buf, offset)
-			//fmt.Println("----", cnt)
-			if cnt == len(buf) || err == io.EOF {
-				if cnt == len(buf) {
-					offset += job
-				} else {
-					offset += int64(cnt)
-				}
-				fmt.Printf("read %d bytes: %q\n", cnt, buf[:cnt])
-				var req string = string(buf[:cnt])
-				go proc(&req, cid, job, service, lockChan)
-			}
-		}
-	*/
+
 	for i := 0; i < int(cid-1); i++ {
 		<-lockChan
 	}
+
 	elapsed := 1000000 * time.Since(start).Seconds()
 	fmt.Println("time elapsed: ", elapsed, "us")
-
 }

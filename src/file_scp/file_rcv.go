@@ -8,15 +8,17 @@ import (
 	"net"
 	"os"
 	"runtime"
+	"strconv"
 )
 
 const (
 	VERSION         = "1.0.0"
 	MAX_BUFFER_SIZE = 1024 * 1024
+	REQ_HEADER      = "10001" // 0X2711
 )
 
 func printVersion() {
-	fmt.Println("file sender" + VERSION + " by gerryyang")
+	fmt.Println("file rcv" + VERSION + " by gerryyang")
 }
 
 func checkError(err error) {
@@ -85,8 +87,21 @@ func handleClient(conn net.Conn, file string) {
 		//fmt.Printf("handleClient: len[%d] req[%#v]\n", n, buf[0:n])
 		fmt.Printf("handleClient: len[%d]\n", n)
 
+		if n < 16 {
+			fmt.Fprintf(os.Stderr, "invalid req len, drop it\n")
+			return
+		}
+
 		var bytes_buf bytes.Buffer
 		bytes_buf.Write(buf[0:n])
+
+		header := BytesToInt64(bytes_buf.Next(8))
+		req_header, _ := strconv.ParseInt(REQ_HEADER, 10, 64)
+
+		if header != req_header {
+			fmt.Fprintf(os.Stderr, "invalid req header, drop it\n")
+			return
+		}
 
 		offset := BytesToInt64(bytes_buf.Next(8))
 		var s_real_req string = string(bytes_buf.Bytes())
@@ -98,7 +113,7 @@ func handleClient(conn net.Conn, file string) {
 		if n > 0 {
 			_, err = conn.Write([]byte("ok"))
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "Write: %s\n", err.Error())
+				fmt.Fprintf(os.Stderr, "Write: err[%s]\n", err.Error())
 				return
 			}
 		}
