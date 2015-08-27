@@ -64,6 +64,7 @@ func proc(req *string, cid int, offset int64, service string, lockChan chan bool
 	var cid_name string
 	cid_name = fmt.Sprintf("%d", cid)
 
+	// TODO here may be fail, and need to retry
 	send(tcpAddr, req, cid_name, offset, lockChan)
 
 }
@@ -86,7 +87,7 @@ func send(tcpAddr *net.TCPAddr, req *string, cid_name string, offset int64, lock
 	bytes_buf.Write(Int64ToBytes(offset))
 	bytes_buf.Write([]byte(*req))
 
-	fmt.Printf("send: cid_name[%s] bytes_buf[%#v]\n", cid_name, bytes_buf.Bytes())
+	//fmt.Printf("send: cid_name[%s] bytes_buf[%#v]\n", cid_name, bytes_buf.Bytes())
 	//fmt.Printf("%q\n", bytes_buf.Bytes())
 
 	_, err = conn.Write(bytes_buf.Bytes())
@@ -113,6 +114,8 @@ func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	file, job, service := handleCommandLine()
 
+	// TODO limit job
+
 	fin, err := os.Open(file)
 	checkError(err)
 	defer fin.Close()
@@ -133,7 +136,8 @@ func main() {
 			if cnt == 0 {
 				break
 			}
-			fmt.Printf("cid[%d] offset[%d] read bytes[%d] buf[%q]\n", cid, offset, cnt, buf[:cnt])
+			//fmt.Printf("cid[%d] offset[%d] read bytes[%d] buf[%q]\n", cid, offset, cnt, buf[:cnt])
+			fmt.Printf("cid[%d] offset[%d] read bytes[%d]\n", cid, offset, cnt)
 			var req string = string(buf[:cnt])
 			go proc(&req, cid, offset, service, lockChan)
 			offset += int64(cnt)
@@ -144,7 +148,8 @@ func main() {
 			continue
 
 		} else {
-			fmt.Printf("cid[%d] offset[%d] read bytes[%d] buf[%q]\n", cid, offset, cnt, buf[:cnt])
+			//fmt.Printf("cid[%d] offset[%d] read bytes[%d] buf[%q]\n", cid, offset, cnt, buf[:cnt])
+			fmt.Printf("cid[%d] offset[%d] read bytes[%d]\n", cid, offset, cnt)
 			var req string = string(buf[:cnt])
 			go proc(&req, cid, offset, service, lockChan)
 			offset += int64(len(buf))
