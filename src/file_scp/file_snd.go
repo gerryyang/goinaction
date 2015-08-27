@@ -120,9 +120,11 @@ func main() {
 	var offset int64 = 0
 	buf := make([]byte, job)
 
-	lockChan := make(chan bool, job)
-	start := time.Now()
+	fin_info, _ := fin.Stat()
+	lockChanNum := fin_info.Size()/job + 1
+	lockChan := make(chan bool, lockChanNum)
 
+	start := time.Now()
 	var cid int = 0
 
 	for {
