@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/binary"
 	"flag"
 	"fmt"
 	"io"
@@ -44,18 +45,28 @@ func handleCommandLine() (file string, job int64, service string) {
 	return *f, *j, *s
 }
 
-func proc(req *string, cid int, job int64, service string, lockChan chan bool) {
+func Int64ToBytes(i int64) []byte {
+	var buf = make([]byte, 8) // int64 is 8 byte
+	binary.LittleEndian.PutUint64(buf, uint64(i))
+	return buf
+}
+
+func BytesToInt64(buf []byte) int64 {
+	return int64(binary.LittleEndian.Uint64(buf))
+}
+
+func proc(req *string, cid int, offset int64, service string, lockChan chan bool) {
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", service)
 	checkError(err)
 
 	var cid_name string
 	cid_name = fmt.Sprintf("%d", cid)
 
-	send(tcpAddr, req, cid_name, job, lockChan)
+	send(tcpAddr, req, cid_name, offset, lockChan)
 
 }
 
-func send(tcpAddr *net.TCPAddr, req *string, cid_name string, job int64, lockChan chan bool) {
+func send(tcpAddr *net.TCPAddr, req *string, cid_name string, offset int64, lockChan chan bool) {
 	fmt.Printf("[%s] start\n", cid_name)
 
 	conn, err := net.DialTCP("tcp", nil, tcpAddr)
@@ -67,10 +78,10 @@ func send(tcpAddr *net.TCPAddr, req *string, cid_name string, job int64, lockCha
 
 	var cid int
 	fmt.Sscanf(cid_name, "%d", &cid)
-	var offset int = cid * int(job)
 
+	// TODO
 	var bytes_buf bytes.Buffer
-	bytes_buf.WriteByte(byte(offset))
+	bytes_buf.Write(Int64ToBytes(offset))
 	bytes_buf.Write([]byte(*req))
 
 	fmt.Printf("%s Write[%#v]\n", cid_name, bytes_buf.Bytes())
@@ -111,24 +122,54 @@ func main() {
 	start := time.Now()
 
 	var cid int = 0
-	cnt, err := fin.ReadAt(buf, offset)
-	if err == io.EOF {
-		fmt.Println("job is too big")
-	}
-	for cid = 0; err != io.EOF; cid++ {
-		cnt, err = fin.ReadAt(buf, offset)
-		//fmt.Println("----", cnt)
-		if cnt == len(buf) || err == io.EOF {
-			if cnt == len(buf) {
-				offset += job
-			} else {
-				offset += int64(cnt)
+
+	for {
+		cnt, err := fin.ReadAt(buf, offset)
+		if err == io.EOF {
+			fmt.Println("=====1 cid:", cid)
+			if cnt == 0 {
+				break
 			}
-			fmt.Printf("read %d bytes: %q\n", cnt, buf[:cnt])
+			fmt.Printf("cid[%d] offset[%d] read %d bytes: %q\n", cid, offset, cnt, buf[:cnt])
 			var req string = string(buf[:cnt])
-			go proc(&req, cid, job, service, lockChan)
+			go proc(&req, cid, offset, service, lockChan)
+			offset += int64(cnt)
+			cid++
+			break
+
+		} else if cnt != len(buf) {
+			fmt.Println("=====2 cid:", cid)
+			continue
+
+		} else {
+			fmt.Println("=====3 cid:", cid)
+			fmt.Printf("cid[%d] offset[%d] read %d bytes: %q\n", cid, offset, cnt, buf[:cnt])
+			var req string = string(buf[:cnt])
+			go proc(&req, cid, offset, service, lockChan)
+			offset += int64(len(buf))
+			cid++
 		}
 	}
+	/*
+		cnt, err := fin.ReadAt(buf, offset)
+		if err == io.EOF {
+			fmt.Println("job is too big")
+		}
+		for cid = 0; err != io.EOF; cid++ {
+			cnt, err = fin.ReadAt(buf, offset)
+			//fmt.Println("----", cnt)
+			if cnt == len(buf) || err == io.EOF {
+				if cnt == len(buf) {
+					offset += job
+				} else {
+					offset += int64(cnt)
+				}
+				fmt.Printf("read %d bytes: %q\n", cnt, buf[:cnt])
+				var req string = string(buf[:cnt])
+				go proc(&req, cid, job, service, lockChan)
+			}
+		}
+	*/
 	for i := 0; i < int(cid-1); i++ {
 		<-lockChan
 	}

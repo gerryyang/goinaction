@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/binary"
 	"flag"
 	"fmt"
 	"net"
@@ -41,7 +42,17 @@ func handleCommandLine() (file string, service string) {
 	return *f, *s
 }
 
-func writeFile(file string, offset int, s_real_req string) {
+func Int64ToBytes(i int64) []byte {
+	var buf = make([]byte, 8) // int64 is 8 byte
+	binary.LittleEndian.PutUint64(buf, uint64(i))
+	return buf
+}
+
+func BytesToInt64(buf []byte) int64 {
+	return int64(binary.LittleEndian.Uint64(buf))
+}
+
+func writeFile(file string, offset int64, s_real_req string) {
 
 	fout, err := os.OpenFile(file, os.O_CREATE|os.O_RDWR|os.O_APPEND, 0666)
 	checkError(err)
@@ -51,12 +62,14 @@ func writeFile(file string, offset int, s_real_req string) {
 	bytes_buf.WriteString(s_real_req)
 
 	var write_len int = len(s_real_req)
-	cnt, err := fout.WriteAt(bytes_buf.Bytes(), int64(offset))
+	cnt, err := fout.WriteAt(bytes_buf.Bytes(), offset)
 	if cnt != write_len {
-		fmt.Fprintf(os.Stderr, "%d cnt[%d] WriteAt: %s\n", offset, cnt, err.Error())
+		fmt.Fprintf(os.Stderr, "WriteAt: offset[%d] cnt[%d] !=  write_len[%d] err: %s\n",
+			offset, cnt, write_len, err.Error())
 		return
 	}
-	fmt.Printf("WriteAt offset[%d] bytes[%d] s_real_req[%#v]\n", offset, cnt, s_real_req)
+	//fmt.Printf("WriteAt: offset[%d] bytes[%d] s_real_req[%#v]\n", offset, cnt, s_real_req)
+	fmt.Printf("WriteAt: offset[%d] bytes[%d]\n", offset, cnt)
 }
 
 func handleClient(conn net.Conn, file string) {
@@ -69,15 +82,16 @@ func handleClient(conn net.Conn, file string) {
 			fmt.Fprintf(os.Stderr, "Read: %s\n", err.Error())
 			return
 		}
-		fmt.Printf("len:%d req:%#v\n", n, buf[0:n])
+		//fmt.Printf("handleClient: len[%d] req[%#v]\n", n, buf[0:n])
+		fmt.Printf("handleClient: len[%d]\n", n)
 
 		var bytes_buf bytes.Buffer
 		bytes_buf.Write(buf[0:n])
-		len, _ := bytes_buf.ReadByte()
 
-		var offset int = int(len)
+		offset := BytesToInt64(bytes_buf.Next(8))
 		var s_real_req string = string(bytes_buf.Bytes())
-		fmt.Printf("file[%s] offset[%d] s_real_req[%#v]\n", file, offset, s_real_req)
+		//fmt.Printf("file[%s] offset[%d] s_real_req[%#v]\n", file, offset, s_real_req)
+		fmt.Printf("handleClient: file[%s] offset[%d]\n", file, offset)
 
 		writeFile(file, offset, s_real_req)
 
@@ -104,7 +118,7 @@ func main() {
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Accept: %s\n", err.Error())
+			fmt.Fprintf(os.Stderr, "Accept: err[%s]\n", err.Error())
 			continue
 		}
 		go handleClient(conn, file)
