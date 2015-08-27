@@ -92,7 +92,7 @@ func handleClient(conn net.Conn, file string) {
 		fmt.Printf("handleClient: len[%d]\n", has_read_cnt)
 
 		// reqlen_total + header + offset + req
-		if has_read_cnt < 8 {
+		if has_read_cnt < 24 {
 			fmt.Fprintf(os.Stderr, "invalid req len, drop it\n")
 			return
 		}

@@ -134,6 +134,10 @@ func main() {
 	var cid int = 0
 
 	for {
+
+		// limit speed
+		//time.Sleep(time.Duration(1) * time.Second)
+
 		cnt, err := fin.ReadAt(buf, offset)
 		if err == io.EOF {
 			if cnt == 0 {
