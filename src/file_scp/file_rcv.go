@@ -78,22 +78,36 @@ func handleClient(conn net.Conn, file string) {
 	defer conn.Close()
 
 	var buf [MAX_BUFFER_SIZE]byte
+	var has_read_cnt int = 0
+	var idx int = 0
+
 	for {
-		n, err := conn.Read(buf[0:])
+		n, err := conn.Read(buf[idx:])
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Read: %s\n", err.Error())
 			return
 		}
+		has_read_cnt += n
 		//fmt.Printf("handleClient: len[%d] req[%#v]\n", n, buf[0:n])
-		fmt.Printf("handleClient: len[%d]\n", n)
+		fmt.Printf("handleClient: len[%d]\n", has_read_cnt)
 
-		if n < 16 {
+		// reqlen_total + header + offset + req
+		if has_read_cnt < 8 {
 			fmt.Fprintf(os.Stderr, "invalid req len, drop it\n")
 			return
 		}
 
 		var bytes_buf bytes.Buffer
-		bytes_buf.Write(buf[0:n])
+		bytes_buf.Write(buf[0:has_read_cnt])
+
+		reqlen_total := BytesToInt64(bytes_buf.Next(8))
+		if reqlen_total != int64(has_read_cnt) {
+			fmt.Fprintf(os.Stderr, "req not get complete, reqlen_total[%d] != has_read_cnt[%d]\n",
+				reqlen_total, has_read_cnt)
+
+			idx += has_read_cnt
+			continue
+		}
 
 		header := BytesToInt64(bytes_buf.Next(8))
 		req_header, _ := strconv.ParseInt(REQ_HEADER, 10, 64)

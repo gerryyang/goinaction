@@ -57,7 +57,7 @@ func BytesToInt64(buf []byte) int64 {
 	return int64(binary.LittleEndian.Uint64(buf))
 }
 
-func proc(req *string, cid int, offset int64, service string, lockChan chan bool) {
+func proc(req *string, reqlen int, cid int, offset int64, service string, lockChan chan bool) {
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", service)
 	checkError(err)
 
@@ -65,11 +65,11 @@ func proc(req *string, cid int, offset int64, service string, lockChan chan bool
 	cid_name = fmt.Sprintf("%d", cid)
 
 	// TODO here may be fail, and need to retry
-	send(tcpAddr, req, cid_name, offset, lockChan)
+	send(tcpAddr, req, reqlen, cid_name, offset, lockChan)
 
 }
 
-func send(tcpAddr *net.TCPAddr, req *string, cid_name string, offset int64, lockChan chan bool) {
+func send(tcpAddr *net.TCPAddr, req *string, reqlen int, cid_name string, offset int64, lockChan chan bool) {
 	conn, err := net.DialTCP("tcp", nil, tcpAddr)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "DialTCP: cid_name[%s] err[%s]\n", cid_name, err.Error())
@@ -82,7 +82,10 @@ func send(tcpAddr *net.TCPAddr, req *string, cid_name string, offset int64, lock
 
 	req_header, _ := strconv.ParseInt(REQ_HEADER, 10, 64)
 
+	var reqlen_total int64 = int64(3*8 + reqlen)
+
 	var bytes_buf bytes.Buffer
+	bytes_buf.Write(Int64ToBytes(reqlen_total))
 	bytes_buf.Write(Int64ToBytes(req_header))
 	bytes_buf.Write(Int64ToBytes(offset))
 	bytes_buf.Write([]byte(*req))
@@ -139,7 +142,7 @@ func main() {
 			//fmt.Printf("cid[%d] offset[%d] read bytes[%d] buf[%q]\n", cid, offset, cnt, buf[:cnt])
 			fmt.Printf("cid[%d] offset[%d] read bytes[%d]\n", cid, offset, cnt)
 			var req string = string(buf[:cnt])
-			go proc(&req, cid, offset, service, lockChan)
+			go proc(&req, cnt, cid, offset, service, lockChan)
 			offset += int64(cnt)
 			cid++
 			break
@@ -151,7 +154,7 @@ func main() {
 			//fmt.Printf("cid[%d] offset[%d] read bytes[%d] buf[%q]\n", cid, offset, cnt, buf[:cnt])
 			fmt.Printf("cid[%d] offset[%d] read bytes[%d]\n", cid, offset, cnt)
 			var req string = string(buf[:cnt])
-			go proc(&req, cid, offset, service, lockChan)
+			go proc(&req, cnt, cid, offset, service, lockChan)
 			offset += int64(len(buf))
 			cid++
 		}
