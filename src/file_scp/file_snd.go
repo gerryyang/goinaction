@@ -59,7 +59,8 @@ func BytesToInt64(buf []byte) int64 {
 	return int64(binary.LittleEndian.Uint64(buf))
 }
 
-func proc(req *string, reqlen int, cid int, offset int64, service string, lock_chan chan bool) {
+func proc(req *string, reqlen int, cid int, offset int64, service string, lock_chan chan bool, lock_job_chan chan bool) {
+
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", service)
 	checkError(err)
 
@@ -67,6 +68,8 @@ func proc(req *string, reqlen int, cid int, offset int64, service string, lock_c
 	cid_name = fmt.Sprintf("%d", cid)
 
 	send(tcpAddr, req, reqlen, cid_name, offset, lock_chan)
+	// flow control, refer to job
+	<-lock_job_chan
 
 }
 
@@ -117,30 +120,12 @@ func send(tcpAddr *net.TCPAddr, req *string, reqlen int, cid_name string, offset
 	conn.Close()
 }
 
-func main() {
-	runtime.GOMAXPROCS(runtime.NumCPU())
-	file, blk, job, service := handleCommandLine()
-	fmt.Println("job:", job)
-
-	fin, err := os.Open(file)
-	checkError(err)
-	defer fin.Close()
-
+func work(fin *os.File, buf []byte, service string, lock_chan chan bool, lock_job_chan chan bool) {
 	var offset int64 = 0
-	buf := make([]byte, blk)
-
-	fin_info, _ := fin.Stat()
-	fmt.Printf("file[%s] size[%d]\n", fin_info.Name(), fin_info.Size())
-
-	lock_chan_len := fin_info.Size()/blk + 1
-	lock_chan := make(chan bool, lock_chan_len)
-
-	start := time.Now()
 	var cid int = 0
 
 	for {
 
-		// limit speed
 		//time.Sleep(time.Duration(1) * time.Second)
 
 		cnt, err := fin.ReadAt(buf, offset)
@@ -151,7 +136,9 @@ func main() {
 			//fmt.Printf("cid[%d] offset[%d] read bytes[%d] buf[%q]\n", cid, offset, cnt, buf[:cnt])
 			fmt.Printf("cid[%d] offset[%d] read bytes[%d] left\n", cid, offset, cnt)
 			var req string = string(buf[:cnt])
-			go proc(&req, cnt, cid, offset, service, lock_chan)
+			// flow control, refer to job
+			lock_job_chan <- true
+			go proc(&req, cnt, cid, offset, service, lock_chan, lock_job_chan)
 			offset += int64(cnt)
 			cid++
 			break
@@ -163,19 +150,35 @@ func main() {
 			//fmt.Printf("cid[%d] offset[%d] read bytes[%d] buf[%q]\n", cid, offset, cnt, buf[:cnt])
 			fmt.Printf("cid[%d] offset[%d] read bytes[%d] all\n", cid, offset, cnt)
 			var req string = string(buf[:cnt])
-			go proc(&req, cnt, cid, offset, service, lock_chan)
+			// flow control, refer to job
+			lock_job_chan <- true
+			go proc(&req, cnt, cid, offset, service, lock_chan, lock_job_chan)
 			offset += int64(len(buf))
 			cid++
 		}
-		/*
-			if (cid % int(job)) == 0 {
-				fmt.Println("unlock")
-				for i := 0; i < int(job-1); i++ {
-					<-lock_chan
-				}
-			}
-		*/
 	}
+}
+
+func main() {
+	runtime.GOMAXPROCS(runtime.NumCPU())
+	file, blk, job, service := handleCommandLine()
+
+	fin, err := os.Open(file)
+	checkError(err)
+	defer fin.Close()
+
+	buf := make([]byte, blk)
+
+	fin_info, _ := fin.Stat()
+	fmt.Printf("file[%s] size[%d]\n", fin_info.Name(), fin_info.Size())
+
+	lock_chan_len := fin_info.Size()/blk + 1
+	lock_chan := make(chan bool, lock_chan_len)
+	lock_job_chan := make(chan bool, job)
+
+	start := time.Now()
+
+	work(fin, buf, service, lock_chan, lock_job_chan)
 
 	// wait for all goroutine completion
 	for i := 0; i < int(lock_chan_len-1); i++ {
