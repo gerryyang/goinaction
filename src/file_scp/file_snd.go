@@ -133,11 +133,11 @@ func work(fin *os.File, buf []byte, service string, lock_chan chan bool, lock_jo
 			if cnt == 0 {
 				break
 			}
+			// flow control, refer to job
+			lock_job_chan <- true
 			//fmt.Printf("cid[%d] offset[%d] read bytes[%d] buf[%q]\n", cid, offset, cnt, buf[:cnt])
 			fmt.Printf("cid[%d] offset[%d] read bytes[%d] left\n", cid, offset, cnt)
 			var req string = string(buf[:cnt])
-			// flow control, refer to job
-			lock_job_chan <- true
 			go proc(&req, cnt, cid, offset, service, lock_chan, lock_job_chan)
 			offset += int64(cnt)
 			cid++
@@ -147,11 +147,11 @@ func work(fin *os.File, buf []byte, service string, lock_chan chan bool, lock_jo
 			continue
 
 		} else {
+			// flow control, refer to job
+			lock_job_chan <- true
 			//fmt.Printf("cid[%d] offset[%d] read bytes[%d] buf[%q]\n", cid, offset, cnt, buf[:cnt])
 			fmt.Printf("cid[%d] offset[%d] read bytes[%d] all\n", cid, offset, cnt)
 			var req string = string(buf[:cnt])
-			// flow control, refer to job
-			lock_job_chan <- true
 			go proc(&req, cnt, cid, offset, service, lock_chan, lock_job_chan)
 			offset += int64(len(buf))
 			cid++
