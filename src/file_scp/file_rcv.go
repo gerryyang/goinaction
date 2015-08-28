@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"flag"
 	"fmt"
+	"io"
 	"net"
 	"os"
 	"runtime"
@@ -84,7 +85,9 @@ func handleClient(conn net.Conn, file string) {
 	for {
 		n, err := conn.Read(buf[idx:])
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Read: %s\n", err.Error())
+			if err != io.EOF {
+				fmt.Fprintf(os.Stderr, "Read: %s\n", err.Error())
+			}
 			return
 		}
 		has_read_cnt += n
@@ -92,7 +95,7 @@ func handleClient(conn net.Conn, file string) {
 		fmt.Printf("handleClient: len[%d]\n", has_read_cnt)
 
 		// reqlen_total + header + offset + req
-		if has_read_cnt < 24 {
+		if has_read_cnt < 8 {
 			fmt.Fprintf(os.Stderr, "invalid req len, drop it\n")
 			return
 		}

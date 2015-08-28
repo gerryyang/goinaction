@@ -1,75 +1,7 @@
-This tool(file_scp) likes scp(secure copy, remote file copy program) but uses golang to copies files between hosts on a network. 
+file_scp is like scp(secure copy, remote file copy program) but uses golang to copies files between hosts on a network. 
 
-Usage
+use dd cmd to create 100M data.txt like:
+dd if=/dev/zero of=test bs=1M count=100
 
-client:
 
-$./file_snd -h
-Usage of ./file_snd:
-  -f="data.txt": file
-  -j=1: job
-  -s="127.0.0.1:9001": host:ip
-  -v=false: print version
-$./file_snd -j=11
-file: data.txt
-job: 11
-host:ip: 127.0.0.1:9001
-read 11 bytes: "0123456789\n"
-read 11 bytes: "0123456789\n"
-read 11 bytes: "0123456789\n"
-read 11 bytes: "0123456789\n"
-read 11 bytes: "0123456789\n"
-[1] start
-[0] start
-[4] start
-[3] start
-[2] start
-2 Write[[]byte{0x16, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0xa}]
-1 Write[[]byte{0xb, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0xa}]
-0 Write[[]byte{0x0, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0xa}]
-3 Write[[]byte{0x21, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0xa}]
-4 Write[[]byte{0x2c, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0xa}]
-[2]Read: ok
-[0]Read: ok
-[1]Read: ok
-[3]Read: ok
-[4]Read: ok
-time elapsed:  2354.272 us
-$ls
-data.txt  data2.txt  file_rcv*  file_rcv.go  file_snd*  file_snd.go
-$md5sum data*
-43d8d16c4173be3e8f4aeffa3b5fdd05  data.txt
-43d8d16c4173be3e8f4aeffa3b5fdd05  data2.txt
-
-server
-
-$./file_rcv -h
-Usage of ./file_rcv:
-  -f="data2.txt": file
-  -s="127.0.0.1:9001": host:ip
-  -v=false: print version
-$./file_rcv 
-file: data2.txt
-host:ip: 127.0.0.1:9001
-
-len:12 req:[]byte{0x0, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0xa}
-file[data2.txt] offset[0] s_real_req["0123456789\n"]
-len:12 req:[]byte{0x2c, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0xa}
-len:12 req:[]byte{0x16, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0xa}
-file[data2.txt] offset[22] s_real_req["0123456789\n"]
-len:12 req:[]byte{0xb, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0xa}
-file[data2.txt] offset[11] s_real_req["0123456789\n"]
-WriteAt offset[0] bytes[11] s_real_req["0123456789\n"]
-WriteAt offset[22] bytes[11] s_real_req["0123456789\n"]
-len:12 req:[]byte{0x21, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0xa}
-WriteAt offset[11] bytes[11] s_real_req["0123456789\n"]
-file[data2.txt] offset[33] s_real_req["0123456789\n"]
-file[data2.txt] offset[44] s_real_req["0123456789\n"]
-WriteAt offset[33] bytes[11] s_real_req["0123456789\n"]
-Read: EOF
-WriteAt offset[44] bytes[11] s_real_req["0123456789\n"]
-Read: EOF
-Read: EOF
-Read: EOF
-Read: EOF
 

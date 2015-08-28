@@ -181,7 +181,7 @@ func main() {
 	work(fin, buf, service, lock_chan, lock_job_chan)
 
 	// wait for all goroutine completion
-	for i := 0; i < int(lock_chan_len-1); i++ {
+	for i := 0; i < int(lock_chan_len); i++ {
 		<-lock_chan
 	}
 
