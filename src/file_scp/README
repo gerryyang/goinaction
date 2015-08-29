@@ -3,5 +3,14 @@ file_scp is like scp(secure copy, remote file copy program) but uses golang to c
 use dd cmd to create 100M data.txt like:
 dd if=/dev/zero of=test bs=1M count=100
 
+file compare may use following way:
+
+cmp f1 f2
+
+od -N 32 -t x1 file
+
+hexdump file | head
+
+md5sum file1 file2
 
 
