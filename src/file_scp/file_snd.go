@@ -120,43 +120,42 @@ func send(tcpAddr *net.TCPAddr, req *string, reqlen int, cid_name string, offset
 	conn.Close()
 }
 
-func work(fin *os.File, buf []byte, service string, lock_chan chan bool, lock_job_chan chan bool) {
+func work(fin *os.File, buf []byte, service string, lock_chan chan bool, lock_job_chan chan bool, cid *int) {
 	var offset int64 = 0
-	var cid int = 0
 
 	for {
 
 		//time.Sleep(time.Duration(1) * time.Second)
 
 		cnt, err := fin.ReadAt(buf, offset)
-		if err == io.EOF {
+		if err != nil && err != io.EOF {
+			fmt.Fprintf(os.Stderr, "ReadAt: fatal error[%s]\n", err.Error())
+			os.Exit(1)
+
+		} else if err == io.EOF {
 			if cnt == 0 {
 				fmt.Println("At end of file, that error is io.EOF and cnt is 0")
 				break
 			}
 			// flow control, refer to job
 			lock_job_chan <- true
-			//fmt.Printf("cid[%d] offset[%d] read bytes[%d] buf[%q]\n", cid, offset, cnt, buf[:cnt])
-			fmt.Printf("cid[%d] offset[%d] read bytes[%d] left\n", cid, offset, cnt)
+			//fmt.Printf("cid[%d] offset[%d] read bytes[%d] buf[%q]\n", *cid, offset, cnt, buf[:cnt])
+			fmt.Printf("cid[%d] offset[%d] read bytes[%d] left\n", *cid, offset, cnt)
 			var req string = string(buf[:cnt])
-			go proc(&req, cnt, cid, offset, service, lock_chan, lock_job_chan)
+			go proc(&req, cnt, *cid, offset, service, lock_chan, lock_job_chan)
 			offset += int64(cnt)
-			cid++
+			*cid++
 			break
-
-		} else if err != nil {
-			fmt.Println("---> this should not happen!")
-			continue
 
 		} else {
 			// flow control, refer to job
 			lock_job_chan <- true
-			//fmt.Printf("cid[%d] offset[%d] read bytes[%d] buf[%q]\n", cid, offset, cnt, buf[:cnt])
-			fmt.Printf("cid[%d] offset[%d] read bytes[%d] all\n", cid, offset, cnt)
+			//fmt.Printf("cid[%d] offset[%d] read bytes[%d] buf[%q]\n", *cid, offset, cnt, buf[:cnt])
+			fmt.Printf("cid[%d] offset[%d] read bytes[%d] all\n", *cid, offset, cnt)
 			var req string = string(buf[:cnt])
-			go proc(&req, cnt, cid, offset, service, lock_chan, lock_job_chan)
+			go proc(&req, cnt, *cid, offset, service, lock_chan, lock_job_chan)
 			offset += int64(len(buf))
-			cid++
+			*cid++
 		}
 	}
 }
@@ -179,11 +178,12 @@ func main() {
 	lock_job_chan := make(chan bool, job)
 
 	start := time.Now()
+	var cid int = 0
 
-	work(fin, buf, service, lock_chan, lock_job_chan)
+	work(fin, buf, service, lock_chan, lock_job_chan, &cid)
 
 	// wait for all goroutine completion
-	for i := 0; i < int(lock_chan_len); i++ {
+	for i := 0; i < cid; i++ {
 		<-lock_chan
 	}
 
