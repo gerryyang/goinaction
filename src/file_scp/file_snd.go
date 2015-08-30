@@ -131,6 +131,7 @@ func work(fin *os.File, buf []byte, service string, lock_chan chan bool, lock_jo
 		cnt, err := fin.ReadAt(buf, offset)
 		if err == io.EOF {
 			if cnt == 0 {
+				fmt.Println("At end of file, that error is io.EOF and cnt is 0")
 				break
 			}
 			// flow control, refer to job
@@ -143,7 +144,8 @@ func work(fin *os.File, buf []byte, service string, lock_chan chan bool, lock_jo
 			cid++
 			break
 
-		} else if cnt != len(buf) {
+		} else if err != nil {
+			fmt.Println("---> this should not happen!")
 			continue
 
 		} else {
