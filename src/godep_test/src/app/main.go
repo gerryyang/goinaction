@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	foo "foolib"
+	foo "lib/foolib"
 )
 
 func main() {
