@@ -16,6 +16,27 @@ Windows: LiteIDE, [zeal](https://zealdocs.org/)
 
 Mac: Dash (注册码from taobao)
 
+## Performance
+
+1. pprof
+
+https://golang.org/pkg/net/http/pprof/
+
+```
+go tool pprof http://localhost:6060/debug/pprof/profile
+```
+
+2. go-torch
+
+https://github.com/uber/go-torch
+
+```
+go-torch -u http://localhost:32775 -t 30
+```
+
+3. graphviz
+
+http://www.graphviz.org/
 
 ## Refer
 
