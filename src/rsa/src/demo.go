@@ -1,14 +1,21 @@
 package main
- 
+
 import (
 	"crypto"
-	"encoding/hex"
 	"encoding/base64"
+	"encoding/hex"
 	"fmt"
 	"rsa_tools"
 )
- 
- var cipher rsa_tools.Cipher
+
+type ENCODE_MODE int64
+
+const (
+	HEX ENCODE_MODE = iota
+	BASE64
+)
+
+var cipher rsa_tools.Cipher
 
 // PKCS8
 var privateKey = []byte(`
@@ -41,28 +48,48 @@ uN9nDdPtCWJLx/4YYQ8JheOJOkRazYyZJom4l4Kmc6/TfDWrlGbMe3cr/fiBUDfM
 PpMCLbgCqT07n+dWz7TShah3ZQ==
 -----END PRIVATE KEY-----
 `)
- 
+
 var publicKey = []byte(`
 -----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4eNY4xZ8SHf6L22IEzqdQUHdhBJ9aRjnJFOvXhGZbZwLyfaIXyb4KhWoFUGAH7jiTCR+XHd8VqVKtN2GgzdLqnuJngS89aavFReaXflo9MN75Imluw76bCRk6KdZE8BQmpzGy1VwaMrpBwT0XZxVxjIrdvMaMkiRWB5r9vyKgbPsrOEAoNX1szxi83pu/Io854Fgb5DRpivlAwPWKQsRrrL4WQrPX7TsgN2g96IxXDPLepMlDlvhi8oA+XdHiZbauGfVqEuV880yWVTHONIMFbkqXTafJmccumvOB90vTD2IOBwkTPRVRGUM0SUlUxlyhuMoSS3cbr1eZn9HgxW9EwIDAQAB
 -----END PUBLIC KEY-----
 `)
- 
- 
+
 func main() {
 	cipher, err := rsa_tools.New(privateKey, publicKey, rsa_tools.PKCS8)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-   plain_text := "action=query&channel=wechat&ts=1538231718&user_id=oEIpN5c8e34o6jaV5KG48vJTDpBA&fTcCu9Qi5QtjaarYkXS4u1zTxtF4igXX"
+	plain_text := "action=query&channel=wechat&ts=1538231718&user_id=oEIpN5c8e34o6jaV5KG48vJTDpBA&fTcCu9Qi5QtjaarYkXS4u1zTxtF4igXX"
 
 	signBytes, err := cipher.Sign([]byte(plain_text), crypto.SHA256)
 	if err != nil {
 		fmt.Println(err)
 	}
-	sign_hex := hex.EncodeToString(signBytes)
-	fmt.Println(sign_hex)
-	sign_base64 := base64.StdEncoding.EncodeToString(signBytes)
-	fmt.Println(sign_base64)
+
+	var enc ENCODE_MODE = BASE64
+
+	if enc == BASE64 {
+		sign_enc := base64.StdEncoding.EncodeToString(signBytes)
+		fmt.Println(sign_enc)
+		sign_dec, err := base64.StdEncoding.DecodeString(sign_enc)
+
+		err = cipher.Verify([]byte(plain_text), sign_dec, crypto.SHA256)
+		if err != nil {
+			fmt.Println(err)
+		}
+		fmt.Println("verify success")
+
+	} else if enc == HEX {
+		sign_enc := hex.EncodeToString(signBytes)
+		fmt.Println(sign_enc)
+		sign_dec, err := hex.DecodeString(sign_enc)
+
+		err = cipher.Verify([]byte(plain_text), sign_dec, crypto.SHA256)
+		if err != nil {
+			fmt.Println(err)
+		}
+		fmt.Println("verify success")
+	}
 }
