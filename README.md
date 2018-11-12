@@ -1,5 +1,5 @@
 
-# Golang in action
+# Golang in Action
 ---
 [TOC]
 
@@ -14,7 +14,7 @@ https://golang.org/pkg/
 
 Windows: LiteIDE, [zeal](https://zealdocs.org/)
 
-Mac: Dash (注册码from taobao)
+Mac: Dash (register codes can be from taobao)
 
 ## Performance
 
@@ -37,6 +37,9 @@ go-torch -u http://localhost:32775 -t 30
 3. graphviz
 
 http://www.graphviz.org/
+
+
+
 
 ## Refer
 
