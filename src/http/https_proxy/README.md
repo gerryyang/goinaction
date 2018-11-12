@@ -1,4 +1,10 @@
 
+在[go1.10](https://golang.org/doc/go1.10)的`net/http`支持client与Proxy通过https通信。
+
+```
+On the client side, an HTTP proxy (most commonly configured by ProxyFromEnvironment) can now be specified as an https:// URL, meaning that the client connects to the proxy over HTTPS before issuing a standard, proxied HTTP request. (Previously, HTTP proxy URLs were required to begin with http:// or socks5://.)
+```
+
 
 # 代理涉及的类型
 
