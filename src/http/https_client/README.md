@@ -4,6 +4,7 @@
 
 # test
 
+```
 $curl -kv "https://127.0.0.1/hello"
 * Hostname was NOT found in DNS cache
 *   Trying 127.0.0.1...
@@ -40,5 +41,5 @@ $curl -kv "https://127.0.0.1/hello"
 < 
 This is an example server.
 * Connection #0 to host 127.0.0.1 left intact
-
+```
 
