@@ -39,9 +39,14 @@ go-torch -u http://localhost:32775 -t 30
 http://www.graphviz.org/
 
 
+## Some Projects
+
+1. [TarsGo](https://github.com/TarsCloud/TarsGo/tree/36cf7d196afc781ba8d70f908decbdd7cceccfd3/tars)
 
 
 ## Refer
+
+[10 things you (probably) don't know about Go](https://talks.golang.org/2012/10things.slide#1)
 
 http://coolshell.cn/articles/8460.html
 

@@ -5,6 +5,12 @@
 On the client side, an HTTP proxy (most commonly configured by ProxyFromEnvironment) can now be specified as an https:// URL, meaning that the client connects to the proxy over HTTPS before issuing a standard, proxied HTTP request. (Previously, HTTP proxy URLs were required to begin with http:// or socks5://.)
 ```
 
+# Test
+
+```
+./https_proxy_hijacker -key server.key -pem server.crt -proto http
+```
+
 
 # 代理涉及的类型
 
@@ -61,4 +67,6 @@ http://www.01happy.com/https-principle-and-golang-practice/
 https://github.com/denji/golang-tls
 
 [golang GET 出现 x509: certificate signed by unknown authority](https://studygolang.com/articles/11175)
+
+https://github.com/snail007/goproxy
 
