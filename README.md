@@ -43,13 +43,19 @@ http://www.graphviz.org/
 
 1. [TarsGo](https://github.com/TarsCloud/TarsGo/tree/36cf7d196afc781ba8d70f908decbdd7cceccfd3/tars)
 
+2. 一个开源的高性能golang日志库 
+
+[Logrus](https://github.com/Sirupsen/logrus)
+
 
 ## Refer
 
+[CoolShell - GO 语言简介（上）— 语法](http://coolshell.cn/articles/8460.html)
+
+[CoolShell - GO 语言简介（下）— 特性](http://coolshell.cn/articles/8489.html)
+
 [10 things you (probably) don't know about Go](https://talks.golang.org/2012/10things.slide#1)
 
-http://coolshell.cn/articles/8460.html
+[50 Shades of Go: Traps, Gotchas, and Common Mistakes for New Golang Devs](http://devs.cloudimmunity.com/gotchas-and-common-mistakes-in-go-golang/)
 
-http://coolshell.cn/articles/8489.html
-
-
+[Golang 新手可能会踩的 50 个坑](https://segmentfault.com/a/1190000013739000)
