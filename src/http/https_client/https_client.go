@@ -46,8 +46,6 @@ func main() {
 
     client := &http.Client{Transport: tr}
     
-    //resp, err := client.Get("https://google.com")
-    //resp, err := client.Get("https://10.56.58.55/hello")
     // 要求生成证书时指定 -subj /CN=localhost
     resp, err := client.Get("https://localhost/hello")
     if err != nil {

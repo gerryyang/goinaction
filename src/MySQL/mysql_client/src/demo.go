@@ -37,7 +37,7 @@ func main() {
 	}
 	fmt.Printf("out line[%s]\n", line)
 
-	db, err := sql.Open("mysql", "gerryyang:@(172.27.198.179:3306)/portal_conf");
+	db, err := sql.Open("mysql", "gerryyang:@(127.0.0.1:3306)/portal_conf");
 	if err != nil {
 		panic(err.Error())
 	}
