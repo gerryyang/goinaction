@@ -37,7 +37,7 @@ func main() {
 	}
 	fmt.Printf("out line[%s]\n", line)
 
-	db, err := sql.Open("mysql", "gerryyang:@(127.0.0.1:3306)/portal_conf");
+	db, err := sql.Open("mysql", "gerryyang:@(127.0.0.1:3306)/db_conf");
 	if err != nil {
 		panic(err.Error())
 	}
@@ -48,7 +48,7 @@ func main() {
 		panic(err.Error())
 	}
 
-	stmtOut, err := db.Prepare("SELECT Fservice_type from portal_service_config where Fservice_code = ?")
+	stmtOut, err := db.Prepare("SELECT Fservice_type from xxx_config where Fservice_code = ?")
 	if err != nil {
 		panic(err.Error())
 	}
