@@ -59,3 +59,5 @@ http://www.graphviz.org/
 [50 Shades of Go: Traps, Gotchas, and Common Mistakes for New Golang Devs](http://devs.cloudimmunity.com/gotchas-and-common-mistakes-in-go-golang/)
 
 [Golang 新手可能会踩的 50 个坑](https://segmentfault.com/a/1190000013739000)
+
+[Some go examples](https://yourbasic.org/golang/)
