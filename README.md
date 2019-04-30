@@ -61,3 +61,5 @@ http://www.graphviz.org/
 [Golang 新手可能会踩的 50 个坑](https://segmentfault.com/a/1190000013739000)
 
 [Some go examples](https://yourbasic.org/golang/)
+
+[dave-high-performance-go-workshop-gopherchina-2019](https://dave.cheney.net/high-performance-go-workshop/gopherchina-2019.html)
