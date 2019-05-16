@@ -63,3 +63,5 @@ http://www.graphviz.org/
 [Some go examples](https://yourbasic.org/golang/)
 
 [dave-high-performance-go-workshop-gopherchina-2019](https://dave.cheney.net/high-performance-go-workshop/gopherchina-2019.html)
+
+[使用二进制形式发布go package](https://colobu.com/2018/01/10/use-binary-package-in-go/)
