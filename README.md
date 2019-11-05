@@ -65,3 +65,13 @@ http://www.graphviz.org/
 [dave-high-performance-go-workshop-gopherchina-2019](https://dave.cheney.net/high-performance-go-workshop/gopherchina-2019.html)
 
 [使用二进制形式发布go package](https://colobu.com/2018/01/10/use-binary-package-in-go/)
+
+## Stuff
+
+[Fast HTTP (L7) and TCP (L4) tunnels written in Go](https://github.com/inlets/inletsctl)
+
+[Go: Memory Management and Allocation](https://medium.com/a-journey-with-go/go-memory-management-and-allocation-a7396d430f44)
+
+[Go: How Does the Garbage Collector Mark the Memory?](https://medium.com/a-journey-with-go/go-how-does-the-garbage-collector-mark-the-memory-72cfc12c6976)
+
+[TCMalloc : Thread-Caching Malloc](http://goog-perftools.sourceforge.net/doc/tcmalloc.html)
