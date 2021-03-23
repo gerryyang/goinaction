@@ -414,6 +414,53 @@ PASS
 ok      github.com/gerryyang/goinaction/module/hello    0.003s
 ```
 
+## Call this module from another module
+
+Take [this codes](https://github.com/gerryyang/goinaction/blob/master/helloworld/hello.go) for example:
+
+``` go
+package main
+
+import (
+        "fmt"
+        goinactionModuleHello "github.com/gerryyang/goinaction/module/hello"
+)
+
+func main() {
+
+        // test goinaction module
+        fmt.Println("Call goinaction module")
+        message = goinactionModuleHello.Hello()
+        fmt.Println(message)
+}
+```
+
+
+```
+$ go list -m all
+example.com/m
+example.com/greetings v0.0.0-00010101000000-000000000000 => ./greetings
+golang.org/x/text v0.0.0-20170915032832-14c0d48ead0c
+rsc.io/quote v1.5.2
+rsc.io/sampler v1.3.0
+$ go get github.com/gerryyang/goinaction/module/hello
+go: downloading github.com/gerryyang/goinaction/module/hello v0.0.0-20210323092231-9586d180a662
+go: downloading github.com/gerryyang/goinaction v0.0.0-20210323092231-9586d180a662
+go get: added github.com/gerryyang/goinaction/module/hello v0.0.0-20210323092231-9586d180a662
+$ go list -m all
+example.com/m
+example.com/greetings v0.0.0-00010101000000-000000000000 => ./greetings
+github.com/gerryyang/goinaction/module/hello v0.0.0-20210323092231-9586d180a662
+golang.org/x/text v0.3.5
+golang.org/x/tools v0.0.0-20180917221912-90fa682c2a6e
+rsc.io/quote v1.5.2
+rsc.io/quote/v3 v3.1.0
+rsc.io/sampler v1.3.1
+$ go run .
+Call goinaction module
+Hello, world.
+```
+
 ## Conclusion
 
 Go modules are the future of dependency management in Go. Module functionality is now available in all supported Go versions (that is, in Go 1.11 and Go 1.12).

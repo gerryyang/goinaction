@@ -5,6 +5,8 @@ import (
 	"log"
 	"rsc.io/quote"
 	"example.com/greetings"
+
+	goinactionModuleHello "github.com/gerryyang/goinaction/module/hello"
 )
 
 func main() {
@@ -38,5 +40,10 @@ func main() {
 	}
 	fmt.Println(messages)
 
+	// test goinaction module
+	fmt.Println("Call goinaction module")
+	message = goinactionModuleHello.Hello()
+	fmt.Println(message)
+	
 }
 
