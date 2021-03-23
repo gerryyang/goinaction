@@ -461,6 +461,49 @@ Call goinaction module
 Hello, world.
 ```
 
+The dependency module will be cached at `GOPATH/pkg/mod/xxx`.
+
+```
+ubuntu@VM-0-16-ubuntu:~/golang/workspace/pkg/mod/github.com/gerryyang/goinaction/module$ tree
+.
+└── hello@v0.0.0-20210323092231-9586d180a662
+    ├── go.mod
+    ├── go.sum
+    ├── hello.go
+    ├── hello_test.go
+    └── world
+        ├── world.go
+        └── world_test.go
+
+2 directories, 6 files
+```
+
+## Build commands
+
+All commands that load information about packages are **module-aware**. This includes:
+
+* go build
+* go fix
+* go generate
+* go get
+* go install
+* go list
+* go run
+* go test
+* go vet
+
+When run in **module-aware mode**, these commands use `go.mod` files to interpret import paths listed on the command line or written in Go source files. These commands accept the following flags, common to all module commands.
+
+* The `-mod` flag controls whether `go.mod` may be automatically updated and whether the `vendor` directory is used.
+	+ `-mod=mod` tells the go command **to ignore the vendor directory and to automatically update go.mod**, for example, when an imported package is not provided by any known module.
+	+ `-mod=readonly` tells the go command **to ignore the vendor directory and to report an error if go.mod needs to be updated**.
+	+ `-mod=vendor` tells the go command **to use the vendor directory. In this mode, the go command will not use the network or the module cache**.
+
+By default, if the go version in go.mod is `1.14 or higher` and a `vendor` directory is present, the go command acts as if `-mod=vendor` were used. Otherwise, the go command acts as if `-mod=readonly` were used.
+
+
+More: https://golang.org/ref/mod#build-commands
+
 ## Conclusion
 
 Go modules are the future of dependency management in Go. Module functionality is now available in all supported Go versions (that is, in Go 1.11 and Go 1.12).
@@ -480,3 +523,4 @@ We encourage you to start using modules in your local development and to add `go
 
 * https://blog.golang.org/using-go-modules
 * https://golang.org/doc/go1.11#modules
+* https://golang.org/ref/mod
