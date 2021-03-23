@@ -1,8 +1,6 @@
 
 # Golang in Action
 
-[TOC]
-
 
 ## API Doc
 
