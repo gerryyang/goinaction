@@ -1,0 +1,13 @@
+Showing nodes accounting for 1697.59kB, 100% of 1697.59kB total
+Showing top 10 nodes out of 16
+      flat  flat%   sum%        cum   cum%
+ 1184.27kB 69.76% 69.76%  1184.27kB 69.76%  runtime/trace.Start
+  513.31kB 30.24%   100%   513.31kB 30.24%  regexp/syntax.(*compiler).inst (inline)
+         0     0%   100%   513.31kB 30.24%  internal/profile.init
+         0     0%   100%  1184.27kB 69.76%  net/http.(*ServeMux).ServeHTTP
+         0     0%   100%  1184.27kB 69.76%  net/http.(*conn).serve
+         0     0%   100%  1184.27kB 69.76%  net/http.HandlerFunc.ServeHTTP
+         0     0%   100%  1184.27kB 69.76%  net/http.serverHandler.ServeHTTP
+         0     0%   100%  1184.27kB 69.76%  net/http/pprof.Trace
+         0     0%   100%   513.31kB 30.24%  regexp.Compile (inline)
+         0     0%   100%   513.31kB 30.24%  regexp.MustCompile
