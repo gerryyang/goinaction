@@ -1,5 +1,14 @@
 package main
 
+/*
+sort.Slice 函数的实现原理：
+
+首先它会接受一个切片和一个比较函数
+它会创建一个 sort.Interface 类型的值，该值保存了切片的长度、比较函数和一个交换元素的函数
+sort.Slice 会调用 sort.Sort 函数对该 sort.Interface 类型的值进行排序
+sort.Sort 函数会使用快速排序算法对切片进行排序
+*/
+
 import (
 	"fmt"
 	"sort"
